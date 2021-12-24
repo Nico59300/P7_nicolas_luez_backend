@@ -1,0 +1,36 @@
+{
+  "name": "p7_nicolas_luez_backend",
+  "version": "1.0.0",
+  "description": "groupomania backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nico59300/p7_nicolas_luez_backend.git"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "mysql"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nico59300/p7_nicolas_luez_backend/issues"
+  },
+  "homepage": "https://github.com/Nico59300/p7_nicolas_luez_backend#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.15",
+    "uuid": "^8.3.2"
+  }
+}
