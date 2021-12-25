@@ -13,9 +13,9 @@ exports.getAllPosts = (req, res, next) => {
 }
 
 exports.getOnePosts = (req, res, next) => {
-    console.log("id " + req.body.id)
-    db.query(`SELECT * FROM posts WHERE id=${req.body.id}`, (err, post) => {
-        if (post.length > 0) {
+    db.query(`SELECT * FROM posts WHERE id=${req.params.id}`, (err, post) => {
+        
+        if (post[0]) {
             let post2send = {
                 postId: post[0].id,
                 author_id: post[0].author_id,
