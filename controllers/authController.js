@@ -7,24 +7,26 @@ require('dotenv').config()
 exports.signup = (req, res, next) => {
     let email = req.body.email;
     let password = req.body.password;
+    let pseudo = req.body.pseudo;
 
     db.query(`SELECT email FROM users WHERE email = '${email}'`, (err, result) => {
 
         if (err) throw err;
 
         if (result.length > 0) {
-            res.status(400).send("email déjà enregistré")
+            res.status(400).send({message: "email déjà enregistré"})
         } else {
             // hashage mot de passe
             bcrypt.hash(password, 10, function(err, hash) {
-                // Store hash in your password DB.
-                db.query(`INSERT INTO users (\`email\`,\`password\`,\`uuid\`) VALUES ('${email}','${hash}','${uuidv4()}' )`, (err, result) => {
+                // save user in db.
+                db.query(`INSERT INTO users (\`email\`,\`password\`,\`uuid\`,\`role\`,\`pseudo\`,\`avatar\`,\`registeredAt\`) 
+                          VALUES ('${email}','${hash}','${uuidv4()}','${"member"}','${pseudo}','default', '${new Date}' )`, (err, result) => {
                     if (err) throw err;
                 })
             });
             // enregistrement db
             
-            res.send("utilisateur enregistré")
+            res.status(201).send({message: "compte utilisateur créé"})
         }
     })
 }
@@ -37,23 +39,21 @@ exports.login = (req, res, next) => {
     let password = req.body.password;
     
     // cherche user en db
-    db.query(`SELECT uuid, password FROM users WHERE email = '${email}'`, (err, result) => {
+    db.query(`SELECT * FROM users WHERE email = '${email}'`, (err, result) => {
         if (err) throw err;
-        console.log(result.length)
+
         if(result.length == 0) {
-            res.status(404).send('utilisateur inconnu')
+            res.status(404).send({message: 'email inconnu'})
         }else {
-            console.log("result : " + result[0].uuid)
-            console.log("result : " + result[0].password)
             // check password
             bcrypt.compare(password, result[0].password).then((valid) => {
                 if(!valid) {
-                    res.status(400).send('informations éronnées')
+                    res.status(400).send({message: 'informations éronnées'})
                 }else {
                     // prepare token for send
-
                     res.status(200).send({
-                        userId: result[0].uuid,
+                        user: result[0],
+                        message: "connecté",
                         token: jwt.sign(
                             { userId: result[0].uuid },
                             process.env.JWT_SECRET || 'RANDOM_TOKEN_SECRET',

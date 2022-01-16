@@ -1,42 +1,41 @@
 const db = require('../db')
 
 exports.getAllPosts = (req, res, next) => {
-    db.query('SELECT * FROM posts', (err, posts) => {
-        console.log(posts)
+    db.query('SELECT * FROM posts ORDER BY createdAt DESC', (err, posts) => {
+     
         if (posts.length > 0) {
-            console.log(posts)
             res.status(200).send(posts)
         } else {
-            res.status(404).send("aucuns posts")
+            res.status(404).send({message: "aucuns posts"})
         }
     })
 }
 
 exports.getOnePosts = (req, res, next) => {
-    db.query(`SELECT * FROM posts WHERE id=${req.params.id}`, (err, post) => {
-        
-        if (post[0]) {
-            let post2send = {
-                postId: post[0].id,
-                author_id: post[0].author_id,
-                title: post[0].title,
-                content: post[0].content
-            }
-            console.log(post2send)
-            res.status(200).send(post2send)
-        } else {
+    
+    db.query(`SELECT p.*, u.pseudo  
+    FROM posts AS p
+    JOIN users AS u ON u.id = p.author_id 
+    WHERE p.id = ${req.params.id}`, (err, post) => {
+        if(err) throw err;
+        console.log("result one post " + JSON.stringify(post))
+        if (post) {
+            res.status(200).send(post)
+        }else {
             res.status(404).send("LE posts que vous demandez n'existe pas")
         }
-
     })
+    
 }
 
 exports.createPost = (req, res, next) => {
-    console.log(req.body)
-    db.query(`INSERT INTO posts (\`title\`,\`content\`,\`author_id\`) VALUES ('${req.body.title}','${req.body.content}','${req.body.author_id}' )`, (err, post) => {
-        if(err) throw err;
+    console.log("id" + req.params.id)
+    let post = req.body
+    console.log("post " + JSON.stringify(post))
+    db.query(`INSERT INTO posts (\`content\`,\`author_id\`,\`createdAt\`) VALUES ('${post.content}','${post.author_id}' ,'${new Date}')`, (err, post) => {
         console.log(post)
-        res.status(201).send("post créé")
+        if(err) throw err;
+        res.status(201).send({message: "post créé"})
     })
 }
 
@@ -61,7 +60,11 @@ exports.modifyPost = (req, res, next) => {
 }
 
 exports.deletePost = (req, res, next) => {
-  
+  console.log("get1post " + req.params.id)
+  db.query(`DELETE FROM posts WHERE id=${req.params.id}`, (err, post) => {
+    if(err) throw err;
+    res.status(200).send('post supprimé')
+})
 }
 
 exports.like = (req, res, next) => {
